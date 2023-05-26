@@ -1,0 +1,129 @@
+#include <iostream>
+#include <stack>
+#include <queue>
+#include <vector>
+#include <list>
+using namespace std;
+
+class Graph {
+    int V; // Number of vertices
+    list<int>* adj; // Adjacency list
+
+public:
+    Graph(int V);
+    void addEdge(int v, int w);
+    void DFS(int startVertex);
+    void BFS(int startVertex);
+};
+
+Graph::Graph(int V) {
+    this->V = V;
+    adj = new list<int>[V];
+}
+
+void Graph::addEdge(int v, int w) {
+    adj[v].push_back(w);
+    adj[w].push_back(v); // Since the graph is undirected
+}
+
+void Graph::DFS(int startVertex) {
+    // Create a vector to keep track of visited vertices
+    vector<bool> visited(V, false);
+
+    // Create a stack for DFS
+    stack<int> stack;
+
+    // Start DFS from the given vertex
+    stack.push(startVertex);
+
+    while (!stack.empty()) {
+        int currentVertex = stack.top();
+        stack.pop();
+
+        // Process the current vertex only if it hasn't been visited
+        if (!visited[currentVertex]) {
+            cout << currentVertex << " ";
+            visited[currentVertex] = true;
+        }
+
+        // Get all adjacent vertices of the current vertex
+        // and push the unvisited ones onto the stack
+        for (auto it = adj[currentVertex].begin(); it != adj[currentVertex].end(); ++it) {
+            if (!visited[*it])
+                stack.push(*it);
+        }
+    }
+}
+
+void Graph::BFS(int startVertex) {
+    // Create a vector to keep track of visited vertices
+    vector<bool> visited(V, false);
+
+    // Create a queue for BFS
+    queue<int> queue;
+
+    // Start BFS from the given vertex
+    queue.push(startVertex);
+    visited[startVertex] = true;
+
+    while (!queue.empty()) {
+        int currentVertex = queue.front();
+        queue.pop();
+        cout << currentVertex << " ";
+
+        // Get all adjacent vertices of the current vertex
+        // and enqueue the unvisited ones
+        for (auto it = adj[currentVertex].begin(); it != adj[currentVertex].end(); ++it) {
+            if (!visited[*it]) {
+                visited[*it] = true;
+                queue.push(*it);
+            }
+        }
+    }
+}
+
+int main() {
+    int V, E;
+    cout << "Enter the number of vertices: ";
+    cin >> V;
+    cout << "Enter the number of edges: ";
+    cin >> E;
+
+    Graph g(V);
+
+    cout << "Enter the edges (vertex pairs):\n";
+    for (int i = 0; i < E; i++) {
+        int u, v;
+        cin >> u >> v;
+        g.addEdge(u, v);
+    }
+
+    int startVertex;
+    cout << "Enter the starting vertex for DFS and BFS: ";
+    cin >> startVertex;
+    bool flag=1;
+    do{
+        int choice;
+        cout<<"Enter 1 for DFS and 2 for BFS : ";
+        cin>>choice;
+        switch(choice)
+        {
+        case 1:
+            cout << "DFS traversal starting from vertex " << startVertex << ": ";
+            g.DFS(startVertex);
+            cout << endl;
+            break;
+        case 2:
+            cout << "BFS traversal starting from vertex " << startVertex << ": ";
+            g.BFS(startVertex);
+            cout << endl;
+            break;
+        default:
+            cout<<"Wrong choice"<<endl;
+        }
+        cout<<"Do you want to continue?(1/0) : ";
+        cin>>flag;
+    }while(flag);
+    
+    return 0;
+}

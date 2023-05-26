@@ -1,0 +1,77 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <climits>
+
+using namespace std;
+
+typedef pair<int, int> pii;
+
+vector<int> dijkstra(vector<vector<pii>>& graph, int start) {
+    int n = graph.size();
+    vector<int> dist(n, INT_MAX);
+    vector<bool> visited(n, false);
+
+    dist[start] = 0;
+    priority_queue<pii, vector<pii>, greater<pii>> pq;
+    pq.push(make_pair(0, start));
+
+    while (!pq.empty()) {
+        int u = pq.top().second;
+        pq.pop();
+
+        if (visited[u]) {
+            continue;
+        }
+
+        visited[u] = true;
+
+        for (const auto& neighbor : graph[u]) {
+            int v = neighbor.first;
+            int weight = neighbor.second;
+
+            if (!visited[v] && dist[u] + weight < dist[v]) {
+                dist[v] = dist[u] + weight;
+                pq.push(make_pair(dist[v], v));
+            }
+        }
+    }
+
+    return dist;
+}
+
+int main() {
+    int n, m;
+    cout << "Enter the number of nodes: ";
+    cin >> n;
+    cout << "Enter the number of edges: ";
+    cin >> m;
+
+    vector<vector<pii>> graph(n);
+
+    cout << "Enter the edges in the format (u, v, weight):\n";
+    for (int i = 0; i < m; i++) {
+        int u, v, weight;
+        cin >> u >> v >> weight;
+        graph[u].push_back(make_pair(v, weight));
+        graph[v].push_back(make_pair(u, weight));
+    }
+
+    int start;
+    cout << "Enter the starting node: ";
+    cin >> start;
+
+    vector<int> distances = dijkstra(graph, start);
+
+    cout << "Shortest distances from node " << start << ":\n";
+    for (int i = 0; i < n; i++) {
+        cout << "Node " << i << ": ";
+        if (distances[i] == INT_MAX) {
+            cout << "Not reachable\n";
+        } else {
+            cout << distances[i] << endl;
+        }
+    }
+
+    return 0;
+}

@@ -1,0 +1,63 @@
+class Employee:
+    def __init__(self, name, id):
+        self.name = name
+        self.id = id
+        self.ratings = {}
+
+    def set_rating(self, question, rating):
+        self.ratings[question] = rating
+
+    def get_total_rating(self):
+        return sum(self.ratings.values())
+
+
+class PerformanceEvaluator:
+    def __init__(self):
+        self.employees = []
+
+    def add_employee(self, name, id):
+        employee = Employee(name, id)
+        self.employees.append(employee)
+
+    def evaluate_employees(self):
+        questions = ["Quality of Work", "Punctuality"]
+        for employee in self.employees:
+            print("Evaluation for", employee.name)
+            for question in questions:
+                rating = int(input(f"Rate {question} (1-5): "))
+                employee.set_rating(question, rating)
+            print()
+
+    def display_employees(self):
+        print("Employee Performance:")
+        for employee in self.employees:
+            print("Name:", employee.name)
+            print("ID:", employee.id)
+            print("Ratings:")
+            for question, rating in employee.ratings.items():
+                print(f"{question}: {rating}")
+            print()
+
+    def get_best_employee(self):
+        best_employee = max(self.employees, key=lambda employee: employee.get_total_rating())
+        return best_employee
+
+
+# Creating a performance evaluator object
+evaluator = PerformanceEvaluator()
+
+# Adding employees
+evaluator.add_employee("John Doe", 1)
+evaluator.add_employee("Jane Smith", 2)
+# Add more employees as needed
+
+# Evaluating employees
+evaluator.evaluate_employees()
+
+# Displaying employee performance
+evaluator.display_employees()
+
+# Getting the employee with the highest overall rating
+best_employee = evaluator.get_best_employee()
+print("Best Employee:", best_employee.name)
+print("Total Rating:", best_employee.get_total_rating())

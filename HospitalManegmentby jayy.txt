@@ -1,0 +1,49 @@
+class Disease:
+    def __init__(self, name, symptoms):
+        self.name = name
+        self.symptoms = symptoms
+
+
+class Hospital:
+    def __init__(self):
+        self.diseases = []
+
+    def add_disease(self, name, symptoms):
+        disease = Disease(name, symptoms)
+        self.diseases.append(disease)
+
+    def find_disease(self, input_symptoms):
+        matching_diseases = []
+        for disease in self.diseases:
+            if set(input_symptoms) == set(disease.symptoms):
+                matching_diseases.append(disease)
+        return matching_diseases
+
+
+# Creating a hospital object
+hospital = Hospital()
+
+# Adding diseases with their symptoms
+hospital.add_disease("Common Cold", ["sore throat", "runny nose", "cough"])
+hospital.add_disease("Influenza", ["high fever", "headache", "fatigue"])
+hospital.add_disease("Strep Throat", ["sore throat", "fever", "difficulty swallowing"])
+# Add more diseases as needed
+
+# User input for symptoms
+input_symptoms = input("Enter your symptoms (comma-separated): ").split(",")
+
+# Finding matching diseases
+matching_diseases = hospital.find_disease(input_symptoms)
+
+# Displaying the results
+if matching_diseases:
+    print("Possible diseases based on symptoms:")
+    for disease in matching_diseases:
+        print(disease.name)
+else:
+    print("No matching diseases found.")
+    
+    
+# Enter your symptoms (comma-separated): fatigue,high fever,headache
+# Possible diseases based on symptoms:
+# Influenza

@@ -1,0 +1,87 @@
+#include <iostream>
+#include <list>
+#include <vector>
+#include <algorithm>
+
+class Graph {
+    int V;
+    std::list<int>* adj;
+
+public:
+    Graph(int V);
+    void addEdge(int v, int w);
+    void greedyColoring();
+};
+
+Graph::Graph(int V) {
+    this->V = V;
+    adj = new std::list<int>[V];
+}
+
+void Graph::addEdge(int v, int w) {
+    adj[v].push_back(w);
+    adj[w].push_back(v);
+}
+
+void Graph::greedyColoring() {
+    std::vector<int> result(V, -1); // Initialize all vertices as unassigned
+
+    // Assign the first color to the first vertex
+    result[0] = 0;
+
+    // A temporary array to store the available colors. True value of available[i]
+    // will indicate whether color 'i' is assigned to any of its adjacent vertices or not
+    std::vector<bool> available(V, true);
+
+    // Assign colors to remaining V-1 vertices
+    for (int u = 1; u < V; u++) {
+        // Process all adjacent vertices and flag their colors as unavailable
+        std::list<int>::iterator it;
+        for (it = adj[u].begin(); it != adj[u].end(); ++it) {
+            if (result[*it] != -1)
+                available[result[*it]] = false;
+        }
+
+        // Find the first available color
+        int color;
+        for (color = 0; color < V; color++) {
+            if (available[color])
+                break;
+        }
+
+        result[u] = color; // Assign the found color
+
+        // Reset the values back to true for the next iteration
+        for (it = adj[u].begin(); it != adj[u].end(); ++it) {
+            if (result[*it] != -1)
+                available[result[*it]] = true;
+        }
+    }
+
+    // Print the result
+    std::cout << "Vertex\tColor\n";
+    for (int u = 0; u < V; u++)
+        std::cout << u << "\t" << result[u] << "\n";
+}
+
+int main() {
+    int V, E;
+    std::cout << "Enter the number of vertices: ";
+    std::cin >> V;
+    std::cout << "Enter the number of edges: ";
+    std::cin >> E;
+
+    Graph g(V);
+
+    std::cout << "Enter the edges (vertex pairs):\n";
+    for (int i = 0; i < E; i++) {
+        int u, v;
+        std::cin >> u >> v;
+        g.addEdge(u, v);
+    }
+
+    std::cout << "Graph coloring:\n";
+    g.greedyColoring();
+
+    return 0;
+}

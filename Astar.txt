@@ -1,0 +1,141 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <map>
+#include <climits>
+
+using namespace std;
+
+// Structure to represent a graph edge
+struct Edge {
+    int destination;
+    int weight;
+};
+
+// Structure to represent a node in the graph
+struct Node {
+    int id;
+    int heuristic;  // Heuristic value for A*
+};
+
+// Comparison function for the priority queue
+struct CompareNodes {
+    bool operator()(const Node& n1, const Node& n2) {
+        return n1.heuristic > n2.heuristic;
+    }
+};
+
+// Function to perform A* search
+void AStarSearch(const vector<vector<Edge>>& graph,const vector<int>& heuristic, int start, int goal) {
+    int numNodes = graph.size();
+
+    // Create priority queue for open nodes
+    priority_queue<Node, vector<Node>, CompareNodes> open;
+
+    // Create a map to store the best known cost for each node
+    map<int, int> gCost;
+
+    // Create a map to store the parent node for each node
+    map<int, int> parent;
+
+    // Initialize g-cost and parent for the start node
+    gCost[start] = 0;
+    parent[start] = -1;
+
+
+    // Add the start node to the open queue
+    open.push({start, heuristic[start]});
+
+    while (!open.empty()) {
+        // Get the node with the lowest f-cost from the open queue
+        Node current = open.top();
+        open.pop();
+
+        int currentNode = current.id;
+
+        // Check if the goal node has been reached
+        if (currentNode == goal)
+            break;
+
+        // Explore neighbors of the current node
+        for (const Edge& edge : graph[currentNode]) {
+            int neighborNode = edge.destination;
+            int newCost = gCost[currentNode] + edge.weight;
+
+            // Update the g-cost and parent if a better path is found
+            if (gCost.find(neighborNode) == gCost.end() || newCost < gCost[neighborNode]) {
+                gCost[neighborNode] = newCost;
+                parent[neighborNode] = currentNode;
+                open.push({neighborNode, newCost + heuristic[neighborNode]});
+            }
+        }
+    }
+
+    // Check if a path to the goal was found
+    if (parent.find(goal) == parent.end()) {
+        cout << "No path found from " << start << " to " << goal << endl;
+        return;
+    }
+
+    // Reconstruct the path from the goal to the start
+    vector<int> path;
+    int current = goal;
+    while (current != -1) {
+        path.push_back(current);
+        current = parent[current];
+    }
+
+    // Print the path in reverse order
+    cout << "Path from " << start << " to " << goal << ": ";
+    for (int i = path.size() - 1; i >= 0; --i) {
+        cout << path[i];
+        if (i != 0)
+            cout << " -> ";
+    }
+    cout << endl;
+}
+
+int main() {
+    int numNodes, numEdges;
+    cout << "Enter the number of nodes in the graph: ";
+    cin >> numNodes;
+
+    cout << "Enter the number of edges in the graph: ";
+    cin >> numEdges;
+
+    vector<vector<Edge>> graph(numNodes);
+
+    cout << "Enter the edges and their weights:\n";
+    for (int i = 0; i < numEdges; ++i) {
+        int source, destination, weight;
+        cout << "Enter edge " << i + 1 << ": ";
+        cin >> source >> destination >> weight;
+
+        // Add edge from source to destination
+        graph[source].push_back({destination, weight});
+
+        // Add edge from destination to source (assuming undirected graph)
+        graph[destination].push_back({source, weight});
+    }
+    
+    vector<int> heuristic(numNodes);
+    for (int i = 0; i < numNodes; ++i) {
+        int value;
+        cout << "Enter heuristic for " << i<< ": ";
+        cin >>value;
+
+        heuristic.push_back(value);
+    }
+
+    int start, goal;
+    cout << "Enter the start node: ";
+    cin >> start;
+
+    cout << "Enter the goal node: ";
+    cin >> goal;
+
+    // Perform A* search
+    AStarSearch(graph,heuristic, start, goal);
+
+    return 0;
+}
